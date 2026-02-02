@@ -1,0 +1,34 @@
+package vn.com.phat.validator.field;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import vn.com.phat.validator.rule.DoubleRuleValidator;
+import vn.com.phat.validator.context.ValidationContext;
+import vn.com.phat.validator.ValidationError;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.ToDoubleFunction;
+
+@Getter
+@AllArgsConstructor
+public class DoubleFieldValidator<E> implements Validator<E> {
+
+    private final String fieldName;
+    private final List<DoubleRuleValidator> rules;
+    private final ToDoubleFunction<E> getter;
+
+    public List<ValidationError> validate(E data, ValidationContext<?,?> context){
+        if(rules == null) return List.of();
+        double value = getter.applyAsDouble(data);
+        
+        List<ValidationError> results = new ArrayList<>(rules.size());
+        for (DoubleRuleValidator rule : rules) {
+            ValidationError res = rule.validate(value, context, fieldName);
+            if (res != null) {
+                results.add(res);
+            }
+        }
+        return results;
+    }
+}
