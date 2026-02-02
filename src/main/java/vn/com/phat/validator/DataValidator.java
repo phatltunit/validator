@@ -33,14 +33,17 @@ public class DataValidator<E extends ValidationMetaData> {
     }
 
     private void validateSingle(E e) {
-        List<ValidationError> results = new ArrayList<>();
+        List<ValidationError> totalResults = null;
         for (Validator<E> field : fields) {
             List<ValidationError> fieldResults = field.validate(e, context);
             if (fieldResults != null && !fieldResults.isEmpty()) {
-                results.addAll(fieldResults);
+                if (totalResults == null) {
+                    totalResults = new ArrayList<>();
+                }
+                totalResults.addAll(fieldResults);
             }
         }
-        e.setValidationResult(results);
+        e.setValidationResult(totalResults);
     }
 
 }
