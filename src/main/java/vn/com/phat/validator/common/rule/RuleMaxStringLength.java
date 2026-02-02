@@ -13,7 +13,7 @@ public class RuleMaxStringLength implements RuleValidator<String> {
     @Override
     public ValidationError validate(String value, ValidationContext<?,?> context, String fieldName) {
         if(value != null && value.length() > maxLength)
-            return ValidationError.fail(fieldName, "The field "+ fieldName + " should not more than " + maxLength + " characters");
+            return ValidationError.fail(fieldName, "Field "+ fieldName + " should not more than " + maxLength + " characters");
         return null;
     }
 }

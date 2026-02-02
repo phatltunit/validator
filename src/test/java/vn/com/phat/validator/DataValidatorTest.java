@@ -97,9 +97,10 @@ class DataValidatorTest {
 
     @Test
     void shouldCaptureSpecializedValidationErrors() {
-        TestObject invalidObj = new TestObject("John Doe", 15, "Description", -1L, -5.5);
+        TestObject invalidObj = new TestObject("Joe", 15, "Description", -1L, -5.5);
         List<TestObject> data = List.of(invalidObj);
 
+        var minLength5 = CommonRules.minStringLength(5);
         IntRuleValidator ageMoreThan18 = (value, context, fieldName) -> 
             value >= 18 ? null : ValidationError.fail(fieldName, "Too young");
         LongRuleValidator positiveId = (value, context, fieldName) -> 
@@ -107,17 +108,19 @@ class DataValidatorTest {
         DoubleRuleValidator positivePrice = (value, context, fieldName) -> 
             value > 0.0 ? null : ValidationError.fail(fieldName, "Negative Price");
 
+        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(minLength5), TestObject::getName);
         Validator<TestObject> ageValidator = new IntFieldValidator<>("age", List.of(ageMoreThan18), TestObject::getAge);
         Validator<TestObject> idValidator = new LongFieldValidator<>("id", List.of(positiveId), TestObject::getId);
         Validator<TestObject> priceValidator = new DoubleFieldValidator<>("price", List.of(positivePrice), TestObject::getPrice);
 
-        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(ageValidator, idValidator, priceValidator), null);
+        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator, ageValidator, idValidator, priceValidator), null);
 
         dataValidator.validate(data);
 
         List<ValidationError> results = invalidObj.getValidationResult();
-        assertThat(results).hasSize(3);
+        assertThat(results).hasSize(4);
         
+        assertThat(results.stream().filter(r -> r.fieldName().equals("name")).findFirst().get().valid()).isFalse();
         assertThat(results.stream().filter(r -> r.fieldName().equals("age")).findFirst().get().valid()).isFalse();
         assertThat(results.stream().filter(r -> r.fieldName().equals("id")).findFirst().get().valid()).isFalse();
         assertThat(results.stream().filter(r -> r.fieldName().equals("price")).findFirst().get().valid()).isFalse();

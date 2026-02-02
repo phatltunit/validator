@@ -9,6 +9,7 @@ public class CommonRules {
 
     private static final RuleRequired<Object> REQUIRED = new RuleRequired<>();
     private static final Map<Integer, RuleMaxStringLength> MAX_LENGTH_CACHE = new HashMap<>();
+    private static final Map<Integer, RuleMinStringLength> MIN_LENGTH_CACHE = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T> RuleRequired<T> required(){
@@ -20,6 +21,15 @@ public class CommonRules {
         if(rule == null){
             rule = new RuleMaxStringLength(length);
             MAX_LENGTH_CACHE.put(length, rule);
+        }
+        return rule;
+    }
+
+    public static RuleMinStringLength minStringLength(int length){
+        RuleMinStringLength rule = MIN_LENGTH_CACHE.get(length);
+        if(rule == null){
+            rule = new RuleMinStringLength(length);
+            MIN_LENGTH_CACHE.put(length, rule);
         }
         return rule;
     }
