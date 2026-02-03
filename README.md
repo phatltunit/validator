@@ -32,34 +32,13 @@ Most Java validation libraries (like Hibernate Validator) rely heavily on Reflec
 
 ## 📦 Installation
 
-Since this library is not yet on Maven Central, you can use it by following these steps:
+Add this to your project's `pom.xml`:
 
-### Option 1: Install to Local Maven Repository (Recommended)
-Clone this project and run the following command to install it to your local `.m2` repository:
-```bash
-mvn clean install
-```
-Then, add this to your project's `pom.xml`:
 ```xml
 <dependency>
     <groupId>io.github.tanphat1095</groupId>
     <artifactId>data-validator</artifactId>
     <version>1.0.0</version>
-</dependency>
-```
-
-### Option 2: Use a Local JAR file
-If you just have the `data-validator-1.0-SNAPSHOT.jar` file, you can add it to your project's `lib` folder and configure Maven to include it:
-
-1. Create a `lib` directory in your project root and put the JAR there.
-2. Add this to your `pom.xml`:
-```xml
-<dependency>
-    <groupId>io.github.tanphat1095</groupId>
-    <artifactId>data-validator</artifactId>
-    <version>1.0.0</version>
-    <scope>system</scope>
-    <systemPath>${project.basedir}/lib/data-validator-1.0.0.jar</systemPath>
 </dependency>
 ```
 
