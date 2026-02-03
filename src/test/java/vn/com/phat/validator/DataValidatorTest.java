@@ -19,6 +19,7 @@ package vn.com.phat.validator;
 import org.junit.jupiter.api.Test;
 import vn.com.phat.validator.common.rule.CommonRules;
 import vn.com.phat.validator.field.*;
+import vn.com.phat.validator.handler.MapValidationResultHandler;
 import vn.com.phat.validator.rule.DoubleRuleValidator;
 import vn.com.phat.validator.rule.IntRuleValidator;
 import vn.com.phat.validator.rule.LongRuleValidator;
@@ -236,6 +237,47 @@ class DataValidatorTest {
         assertThat(results.get(0).getValidationResult()).isNullOrEmpty();
         assertThat(results.get(1)).isNull();
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldValidateHashMapData() {
+        // Given
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("username", null);
+        data.put("age", 15);
+
+        Validator<java.util.Map<String, Object>> nameValidator = new FieldValidator<>(
+                "username", 
+                List.of(CommonRules.required()), 
+                m -> (String) m.get("username")
+        );
+        
+        IntRuleValidator ageMoreThan18 = (value, context, fieldName) -> 
+            value >= 18 ? null : ValidationError.fail(fieldName, "Too young");
+            
+        Validator<java.util.Map<String, Object>> ageValidator = new IntFieldValidator<>(
+                "age", 
+                List.of(ageMoreThan18), 
+                m -> (Integer) m.get("age")
+        );
+
+        DataValidator<java.util.Map<String, Object>> dataValidator = new DataValidator<>(
+                List.of(nameValidator, ageValidator), 
+                null
+        );
+
+        // When
+        dataValidator.validate(data);
+
+        // Then
+        assertThat(data).containsKey(MapValidationResultHandler.MAP_RESULT_ERROR);
+        List<ValidationError> errors = (List<ValidationError>) data.get(MapValidationResultHandler.MAP_RESULT_ERROR);
+        assertThat(errors).hasSize(2);
+        assertThat(errors.get(0).fieldName()).isEqualTo("username");
+        assertThat(errors.get(1).fieldName()).isEqualTo("age");
+        assertThat(errors.get(1).message()).isEqualTo("Too young");
+    }
+
 
     @lombok.Getter
     @lombok.Setter

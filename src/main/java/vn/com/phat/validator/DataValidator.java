@@ -16,9 +16,10 @@
 
 package vn.com.phat.validator;
 
-import lombok.AllArgsConstructor;
 import vn.com.phat.validator.context.ValidationContext;
 import vn.com.phat.validator.field.Validator;
+import vn.com.phat.validator.handler.ValidationResultHandler;
+import vn.com.phat.validator.handler.ValidationResultHandlerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +29,23 @@ import java.util.stream.Stream;
  * @author PhatLT
  * @since 1.0.0
  */
-@AllArgsConstructor
-public class DataValidator<E extends Validatable> {
+public class DataValidator<E> {
 
     private final List<Validator<E>> fields;
     private final ValidationContext<?,?> context;
+    private final ValidationResultHandlerFactory handlerFactory;
+
+    public DataValidator(List<Validator<E>> fields, ValidationContext<?,?> context){
+        this.fields = fields;
+        this.context = context;
+        this.handlerFactory = new ValidationResultHandlerFactory();
+    }
+
+    public DataValidator(List<Validator<E>> fields, ValidationContext<?,?> context, List<ValidationResultHandler> customHandlers){
+        this.fields = fields;
+        this.context = context;
+        this.handlerFactory = new ValidationResultHandlerFactory(customHandlers);
+    }
 
     public Iterable<E> validate(Iterable<E> data){
         if(data == null) return List.of();
@@ -52,8 +65,9 @@ public class DataValidator<E extends Validatable> {
         return dataStream.map(this::validate);
     }
 
-    public E validate(E e){
-        if (e == null) return null;
+    public E validate(E e) {
+        if (e == null)
+            return null;
         List<ValidationError> totalResults = null;
         for (Validator<E> field : fields) {
             List<ValidationError> fieldResults = field.validate(e, context);
@@ -64,8 +78,13 @@ public class DataValidator<E extends Validatable> {
                 totalResults.addAll(fieldResults);
             }
         }
-        e.setValidationResult(totalResults);
+        handleResult(e, totalResults);
         return e;
     }
 
+    private void handleResult(Object object, List<ValidationError> errors){
+        if(object == null) return;
+        handlerFactory.getHandler(object.getClass())
+                .ifPresent(handler -> handler.handle(object, errors));
+    }
 }
