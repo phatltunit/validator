@@ -5,6 +5,8 @@ import vn.com.phat.validator.rule.RuleValidator;
 import vn.com.phat.validator.context.ValidationContext;
 import vn.com.phat.validator.ValidationError;
 
+import java.text.MessageFormat;
+
 @AllArgsConstructor
 public class RuleMaxStringLength implements RuleValidator<String> {
 
@@ -13,7 +15,7 @@ public class RuleMaxStringLength implements RuleValidator<String> {
     @Override
     public ValidationError validate(String value, ValidationContext<?,?> context, String fieldName) {
         if(value != null && value.length() > maxLength)
-            return ValidationError.fail(fieldName, "Field "+ fieldName + " should not more than " + maxLength + " characters");
+            return ValidationError.fail(fieldName, MessageFormat.format("Field {0} should not more than {1} characters", fieldName, maxLength));
         return null;
     }
 }

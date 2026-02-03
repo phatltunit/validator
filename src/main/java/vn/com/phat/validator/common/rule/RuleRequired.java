@@ -4,11 +4,13 @@ import vn.com.phat.validator.rule.RuleValidator;
 import vn.com.phat.validator.context.ValidationContext;
 import vn.com.phat.validator.ValidationError;
 
+import java.text.MessageFormat;
+
 public class RuleRequired<T> implements RuleValidator<T> {
 
     @Override
     public ValidationError validate(T value, ValidationContext<?,?> context, String fieldName) {
-        if(value == null) return ValidationError.fail(fieldName, "Field "+ fieldName + " is required.");
+        if(value == null) return ValidationError.fail(fieldName, MessageFormat.format("Field {0} is required", fieldName));
         return null;
     }
 }

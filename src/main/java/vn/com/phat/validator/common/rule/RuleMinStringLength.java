@@ -5,6 +5,8 @@ import vn.com.phat.validator.ValidationError;
 import vn.com.phat.validator.context.ValidationContext;
 import vn.com.phat.validator.rule.RuleValidator;
 
+import java.text.MessageFormat;
+
 @AllArgsConstructor
 public class RuleMinStringLength implements RuleValidator<String> {
 
@@ -13,7 +15,7 @@ public class RuleMinStringLength implements RuleValidator<String> {
     @Override
     public ValidationError validate(String value, ValidationContext<?, ?> context, String fieldName) {
         if(value != null && value.length() < minLength)
-            return ValidationError.fail(fieldName, "Field "+ fieldName + " should not less than "+ minLength+ " characters");
+            return ValidationError.fail(fieldName, MessageFormat.format("Field {0} should not less than {1} characters", fieldName, minLength));
         return null;
     }
 }
