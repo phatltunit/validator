@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
-public class DataValidator<E extends ValidationMetaData> {
+public class DataValidator<E extends Validatable> {
 
     private final List<Validator<E>> fields;
     private final ValidationContext<?,?> context;
@@ -18,7 +18,7 @@ public class DataValidator<E extends ValidationMetaData> {
         if(data == null) return List.of();
         
         for (E e : data) {
-            validateSingle(e);
+            validate(e);
         }
         return data;
     }
@@ -29,10 +29,10 @@ public class DataValidator<E extends ValidationMetaData> {
      */
     public Stream<E> validate(Stream<E> dataStream) {
         if (dataStream == null) return Stream.empty();
-        return dataStream.peek(this::validateSingle);
+        return dataStream.map(this::validate);
     }
 
-    private void validateSingle(E e) {
+    public E validate(E e){
         List<ValidationError> totalResults = null;
         for (Validator<E> field : fields) {
             List<ValidationError> fieldResults = field.validate(e, context);
@@ -44,6 +44,7 @@ public class DataValidator<E extends ValidationMetaData> {
             }
         }
         e.setValidationResult(totalResults);
+        return e;
     }
 
 }

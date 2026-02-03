@@ -129,7 +129,7 @@ class DataValidatorTest {
     @lombok.Getter
     @lombok.Setter
     @lombok.AllArgsConstructor
-    static class TestObject implements ValidationMetaData {
+    static class TestObject implements Validatable {
         private String name;
         private int age;
         private String desc;
