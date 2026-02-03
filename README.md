@@ -42,9 +42,9 @@ mvn clean install
 Then, add this to your project's `pom.xml`:
 ```xml
 <dependency>
-    <groupId>vn.com.phat</groupId>
+    <groupId>io.github.tanphat1095</groupId>
     <artifactId>data-validator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -55,11 +55,11 @@ If you just have the `data-validator-1.0-SNAPSHOT.jar` file, you can add it to y
 2. Add this to your `pom.xml`:
 ```xml
 <dependency>
-    <groupId>vn.com.phat</groupId>
+    <groupId>io.github.tanphat1095</groupId>
     <artifactId>data-validator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <scope>system</scope>
-    <systemPath>${project.basedir}/lib/data-validator-1.0-SNAPSHOT.jar</systemPath>
+    <systemPath>${project.basedir}/lib/data-validator-1.0.0.jar</systemPath>
 </dependency>
 ```
 
