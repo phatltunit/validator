@@ -126,6 +126,97 @@ class DataValidatorTest {
         assertThat(results.stream().filter(r -> r.fieldName().equals("price")).findFirst().get().valid()).isFalse();
     }
 
+    @Test
+    void shouldPassIfNoRulesConfigured() {
+        TestObject obj = new TestObject("John Doe", 25, "Senior Developer", 1000L, 99.9);
+        List<TestObject> data = List.of(obj);
+
+        // String field with empty rules
+        Validator<TestObject> stringValidator = new FieldValidator<>("name", List.of(), TestObject::getName);
+        // Primitive int with null rules
+        Validator<TestObject> intValidator = new IntFieldValidator<>("age", null, TestObject::getAge);
+        // Primitive long with empty rules
+        Validator<TestObject> longValidator = new LongFieldValidator<>("id", List.of(), TestObject::getId);
+        // Primitive double with null rules
+        Validator<TestObject> doubleValidator = new DoubleFieldValidator<>("price", null, TestObject::getPrice);
+        
+        DataValidator<TestObject> dataValidator = new DataValidator<>(
+            List.of(stringValidator, intValidator, longValidator, doubleValidator), 
+            null
+        );
+
+        dataValidator.validate(data);
+
+        assertThat(obj.getValidationResult()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldPassIfOptionalFieldIsNull() {
+        // Given: Name is null, but no 'required' rule is set
+        TestObject obj = new TestObject(null, 25, "Senior Developer", 1000L, 99.9);
+        List<TestObject> data = List.of(obj);
+
+        var maxLength10 = CommonRules.maxStringLength(10);
+        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(maxLength10), TestObject::getName);
+        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator), null);
+
+        // When
+        dataValidator.validate(data);
+
+        // Then
+        assertThat(obj.getValidationResult()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldHandleNullData() {
+        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(), null);
+        
+        // Null iterable
+        assertThat(dataValidator.validate((List<TestObject>) null)).isEmpty();
+        
+        // Null stream
+        assertThat(dataValidator.validate((Stream<TestObject>) null)).isEmpty();
+        
+        // Null single object
+        assertThat(dataValidator.validate((TestObject) null)).isNull();
+    }
+
+    @Test
+    void shouldHandleNullItemsInData() {
+        TestObject validObj = new TestObject("John Doe", 25, "Senior Developer", 1000L, 99.9);
+        List<TestObject> data = new java.util.ArrayList<>();
+        data.add(validObj);
+        data.add(null);
+        
+        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(CommonRules.required()), TestObject::getName);
+        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator), null);
+
+        // When
+        dataValidator.validate(data);
+
+        // Then
+        assertThat(data).hasSize(2);
+        assertThat(data.get(0).getValidationResult()).isNullOrEmpty();
+        assertThat(data.get(1)).isNull();
+    }
+
+    @Test
+    void shouldHandleNullItemsInStream() {
+        TestObject validObj = new TestObject("John Doe", 25, "Senior Developer", 1000L, 99.9);
+        Stream<TestObject> dataStream = Stream.of(validObj, null);
+        
+        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(CommonRules.required()), TestObject::getName);
+        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator), null);
+
+        // When
+        List<TestObject> results = dataValidator.validate(dataStream).toList();
+
+        // Then
+        assertThat(results).hasSize(2);
+        assertThat(results.get(0).getValidationResult()).isNullOrEmpty();
+        assertThat(results.get(1)).isNull();
+    }
+
     @lombok.Getter
     @lombok.Setter
     @lombok.AllArgsConstructor

@@ -33,6 +33,7 @@ public class DataValidator<E extends Validatable> {
     }
 
     public E validate(E e){
+        if (e == null) return null;
         List<ValidationError> totalResults = null;
         for (Validator<E> field : fields) {
             List<ValidationError> fieldResults = field.validate(e, context);

@@ -1,16 +1,17 @@
 package vn.com.phat.validator.common.rule;
 
-import vn.com.phat.validator.rule.RuleValidator;
 import vn.com.phat.validator.context.ValidationContext;
 import vn.com.phat.validator.ValidationError;
+import vn.com.phat.validator.rule.AbstractRule;
 
-import java.text.MessageFormat;
 
-public class RuleRequired<T> implements RuleValidator<T> {
+public class RuleRequired<T> extends AbstractRule<T, RuleRequired<T>> {
 
     @Override
     public ValidationError validate(T value, ValidationContext<?,?> context, String fieldName) {
-        if(value == null) return ValidationError.fail(fieldName, MessageFormat.format("Field {0} is required", fieldName));
+        if(value == null) {
+            return fail(context, fieldName, "Field {0} is required.", fieldName);
+        }
         return null;
     }
 }

@@ -1,37 +1,19 @@
 package vn.com.phat.validator.common.rule;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class CommonRules {
 
     private CommonRules(){}
 
-    private static final RuleRequired<Object> REQUIRED = new RuleRequired<>();
-    private static final Map<Integer, RuleMaxStringLength> MAX_LENGTH_CACHE = new HashMap<>();
-    private static final Map<Integer, RuleMinStringLength> MIN_LENGTH_CACHE = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
     public static <T> RuleRequired<T> required(){
-        return (RuleRequired<T>) REQUIRED;
+        return new RuleRequired<>();
     }
 
     public static RuleMaxStringLength maxStringLength(int length){
-        RuleMaxStringLength rule = MAX_LENGTH_CACHE.get(length);
-        if(rule == null){
-            rule = new RuleMaxStringLength(length);
-            MAX_LENGTH_CACHE.put(length, rule);
-        }
-        return rule;
+        return new RuleMaxStringLength(length);
     }
 
     public static RuleMinStringLength minStringLength(int length){
-        RuleMinStringLength rule = MIN_LENGTH_CACHE.get(length);
-        if(rule == null){
-            rule = new RuleMinStringLength(length);
-            MIN_LENGTH_CACHE.put(length, rule);
-        }
-        return rule;
+        return new RuleMinStringLength(length);
     }
 
 }
