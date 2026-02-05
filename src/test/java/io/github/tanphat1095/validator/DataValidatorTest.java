@@ -282,6 +282,148 @@ class DataValidatorTest {
         assertThat(errors.get(1).message()).isEqualTo("Too young");
     }
 
+    @Test
+    void shouldValidateObjectItself() {
+        // Given
+        TestObject obj = new TestObject("John", 10, "Kid", 1L, 10.0);
+        List<TestObject> data = List.of(obj);
+
+        // Rule: if age < 18, name must start with "Junior"
+        RuleValidator<TestObject> namingConvention = (value, context, targetName) -> {
+            if (value.getAge() < 18 && !value.getName().startsWith("Junior")) {
+                 return ValidationError.fail(targetName, "Underage must have Junior prefix");
+            }
+            return null;
+        };
+
+        // Validator for the object itself
+        Validator<TestObject> selfValidator = new ObjectValidator<>(
+                "self", 
+                List.of(namingConvention), 
+                java.util.function.Function.identity()
+        );
+
+        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(selfValidator), null);
+
+        // When
+        dataValidator.validate(data);
+
+        // Then
+        assertThat(obj.getValidationResult()).hasSize(1);
+        assertThat(obj.getValidationResult().get(0).message()).isEqualTo("Underage must have Junior prefix");
+        
+        // Fix valid case
+        obj.setName("Junior John");
+        
+        // Re-validate
+        dataValidator.validate(data);
+        
+        // Depending on handler implementation, this might be null or empty
+        if (obj.getValidationResult() != null) {
+            assertThat(obj.getValidationResult()).isEmpty();
+        }
+    }
+
+    @Test
+    void shouldValidateBothFieldsAndObjectItself() {
+        // Given
+        // Case: Name is null (Field error), Age is 16 and Price is 100 (Object logic error: Kids can't spend > 50)
+        TestObject obj = new TestObject(null, 16, "Kid", 1L, 100.0);
+        List<TestObject> data = List.of(obj);
+
+        // 1. Field Validation Rules
+        Validator<TestObject> nameValidator = new ObjectValidator<>(
+                "name", 
+                List.of(CommonRules.required()), 
+                TestObject::getName
+        );
+
+        // 2. Object Logic Validation Rules
+        RuleValidator<TestObject> spendingLimitForKids = (value, context, fieldName) -> {
+            if (value.getAge() < 18 && value.getPrice() > 50.0) {
+                 return ValidationError.fail("spending", "Kids under 18 cannot spend more than 50.0");
+            }
+            return null;
+        };
+
+        Validator<TestObject> selfValidator = new ObjectValidator<>(
+                "self", 
+                List.of(spendingLimitForKids), 
+                java.util.function.Function.identity()
+        );
+
+        // Combine both
+        DataValidator<TestObject> dataValidator = new DataValidator<>(
+                List.of(nameValidator, selfValidator), 
+                null
+        );
+
+        // When
+        dataValidator.validate(data);
+
+        // Then
+        List<ValidationError> errors = obj.getValidationResult();
+        assertThat(errors).hasSize(2);
+        
+        // Assert field error
+        assertThat(errors.stream().anyMatch(e -> 
+            e.targetName().equals("name") && e.valid()
+        )).isFalse();
+        
+        // Assert object logic error
+        assertThat(errors.stream().anyMatch(e -> 
+            e.targetName().equals("spending") && e.message().equals("Kids under 18 cannot spend more than 50.0")
+        )).isTrue();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldDetectDuplicateValuesInList() {
+        // Given
+        TestObject obj1 = new TestObject("John", 25, "Senior", 1001L, 99.9);
+        TestObject obj2 = new TestObject("Jane", 22, "Junior", 1002L, 50.0);
+        TestObject obj3 = new TestObject("Jack", 30, "Lead", 1001L, 120.0); // Duplicate ID with obj1
+
+        List<TestObject> data = List.of(obj1, obj2, obj3);
+
+        // Define a mutable context to hold state across the validation process
+        io.github.tanphat1095.validator.context.DefaultValidationContext context 
+            = new io.github.tanphat1095.validator.context.DefaultValidationContext();
+        
+        // Initialize the "seen" set
+        // In a real scenario, this key should be a constant
+        context.put("seen_ids", new java.util.HashSet<Long>());
+
+        // Stateful Rule: Check uniqueness
+        LongRuleValidator uniqueIdRule = (value, ctx, fieldName) -> {
+            java.util.Set<Long> seenIds = (java.util.Set<Long>) ctx.get("seen_ids");
+            if (seenIds.contains(value)) {
+                return ValidationError.fail(fieldName, "Duplicate ID: " + value);
+            }
+            seenIds.add(value);
+            return null;
+        };
+
+        Validator<TestObject> idValidator = new LongValidator<>(
+                "id", 
+                List.of(uniqueIdRule), 
+                TestObject::getId
+        );
+
+        DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(idValidator), context);
+
+        // When
+        dataValidator.validate(data);
+
+        // Then
+        assertThat(obj1.getValidationResult()).isNullOrEmpty();
+        assertThat(obj2.getValidationResult()).isNullOrEmpty();
+        
+        // obj3 should fail because 1001 was seen in obj1
+        assertThat(obj3.getValidationResult()).hasSize(1);
+        assertThat(obj3.getValidationResult().get(0).message()).contains("Duplicate ID: 1001");
+    }
+
 
     @lombok.Getter
     @lombok.Setter
