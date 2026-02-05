@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.tanphat1095.validator.field;
+package io.github.tanphat1095.validator.type;
 
 import io.github.tanphat1095.validator.ValidationError;
 import io.github.tanphat1095.validator.context.ValidationContext;

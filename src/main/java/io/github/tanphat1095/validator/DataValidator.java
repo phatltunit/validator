@@ -17,7 +17,7 @@
 package io.github.tanphat1095.validator;
 
 import io.github.tanphat1095.validator.context.ValidationContext;
-import io.github.tanphat1095.validator.field.Validator;
+import io.github.tanphat1095.validator.type.Validator;
 import io.github.tanphat1095.validator.handler.ValidationResultHandler;
 import io.github.tanphat1095.validator.handler.ValidationResultHandlerFactory;
 
@@ -31,18 +31,18 @@ import java.util.stream.Stream;
  */
 public class DataValidator<E> {
 
-    private final List<Validator<E>> fields;
+    private final List<Validator<E>> targets;
     private final ValidationContext<?,?> context;
     private final ValidationResultHandlerFactory handlerFactory;
 
-    public DataValidator(List<Validator<E>> fields, ValidationContext<?,?> context){
-        this.fields = fields;
+    public DataValidator(List<Validator<E>> targets, ValidationContext<?,?> context){
+        this.targets = targets;
         this.context = context;
         this.handlerFactory = new ValidationResultHandlerFactory();
     }
 
-    public DataValidator(List<Validator<E>> fields, ValidationContext<?,?> context, List<ValidationResultHandler> customHandlers){
-        this.fields = fields;
+    public DataValidator(List<Validator<E>> targets, ValidationContext<?,?> context, List<ValidationResultHandler> customHandlers){
+        this.targets = targets;
         this.context = context;
         this.handlerFactory = new ValidationResultHandlerFactory(customHandlers);
     }
@@ -69,13 +69,13 @@ public class DataValidator<E> {
         if (e == null)
             return null;
         List<ValidationError> totalResults = null;
-        for (Validator<E> field : fields) {
-            List<ValidationError> fieldResults = field.validate(e, context);
-            if (fieldResults != null && !fieldResults.isEmpty()) {
+        for (Validator<E> target : targets) {
+            List<ValidationError> validationResult = target.validate(e, context);
+            if (validationResult != null && !validationResult.isEmpty()) {
                 if (totalResults == null) {
                     totalResults = new ArrayList<>();
                 }
-                totalResults.addAll(fieldResults);
+                totalResults.addAll(validationResult);
             }
         }
         handleResult(e, totalResults);

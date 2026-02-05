@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-package io.github.tanphat1095.validator.field;
+package io.github.tanphat1095.validator.type;
 
-import io.github.tanphat1095.validator.rule.LongRuleValidator;
+import io.github.tanphat1095.validator.rule.DoubleRuleValidator;
 import io.github.tanphat1095.validator.context.ValidationContext;
 import io.github.tanphat1095.validator.ValidationError;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.ToLongFunction;
+import java.util.function.ToDoubleFunction;
 
 /**
  * @author PhatLT
  * @since 1.0.0
  */
-public record LongValidator<E>(String targetName, List<LongRuleValidator> rules, ToLongFunction<E> getter) implements Validator<E> {
+public record DoubleValidator<E>(String targetName, List<DoubleRuleValidator> rules, ToDoubleFunction<E> getter) implements Validator<E> {
 
     public List<ValidationError> validate(E data, ValidationContext<?, ?> context) {
         if (rules == null || rules.isEmpty())
             return Collections.emptyList();
-        long value = getter.applyAsLong(data);
+        double value = getter.applyAsDouble(data);
 
         List<ValidationError> results = null;
-        for (LongRuleValidator rule : rules) {
+        for (DoubleRuleValidator rule : rules) {
             ValidationError res = rule.validate(value, context, targetName);
             if (res != null) {
                 if (results == null) {

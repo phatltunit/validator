@@ -16,11 +16,11 @@
 
 package io.github.tanphat1095.validator;
 
-import io.github.tanphat1095.validator.field.DoubleValidator;
-import io.github.tanphat1095.validator.field.ObjectValidator;
-import io.github.tanphat1095.validator.field.IntValidator;
-import io.github.tanphat1095.validator.field.LongValidator;
-import io.github.tanphat1095.validator.field.Validator;
+import io.github.tanphat1095.validator.type.DoubleValidator;
+import io.github.tanphat1095.validator.type.ObjectValidator;
+import io.github.tanphat1095.validator.type.IntValidator;
+import io.github.tanphat1095.validator.type.LongValidator;
+import io.github.tanphat1095.validator.type.Validator;
 import org.junit.jupiter.api.Test;
 import io.github.tanphat1095.validator.common.rule.CommonRules;
 import io.github.tanphat1095.validator.handler.MapValidationResultHandler;
