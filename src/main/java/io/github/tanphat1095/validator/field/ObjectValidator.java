@@ -29,7 +29,7 @@ import java.util.function.Function;
  * @author PhatLT
  * @since 1.0.0
  */
-public record FieldValidator<T, E>(String fieldName, List<RuleValidator<T>> rules, Function<E, T> getter) implements Validator<E> {
+public record ObjectValidator<T, E>(String targetName, List<RuleValidator<T>> rules, Function<E, T> getter) implements Validator<E> {
 
     public List<ValidationError> validate(E data, ValidationContext<?, ?> context) {
         if (rules == null || rules.isEmpty())
@@ -38,7 +38,7 @@ public record FieldValidator<T, E>(String fieldName, List<RuleValidator<T>> rule
 
         List<ValidationError> results = null;
         for (RuleValidator<T> rule : rules) {
-            ValidationError res = rule.validate(value, context, fieldName);
+            ValidationError res = rule.validate(value, context, targetName);
             if (res != null) {
                 if (results == null) {
                     results = new ArrayList<>();

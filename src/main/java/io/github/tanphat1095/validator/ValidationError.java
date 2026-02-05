@@ -20,12 +20,12 @@ package io.github.tanphat1095.validator;
  * @author PhatLT
  * @since 1.0.0
  */
-public record ValidationError(boolean valid, String fieldName, String message, String errorCode) {
-    public static ValidationError fail(String fieldName, String message) {
-        return new ValidationError(false, fieldName, message, null);
+public record ValidationError(boolean valid, String targetName, String message, String errorCode) {
+    public static ValidationError fail(String targetName, String message) {
+        return new ValidationError(false, targetName, message, null);
     }
 
-    public static ValidationError fail(String fieldName, String message, String errorCode) {
-        return new ValidationError(false, fieldName, message, errorCode);
+    public static ValidationError fail(String targetName, String message, String errorCode) {
+        return new ValidationError(false, targetName, message, errorCode);
     }
 }

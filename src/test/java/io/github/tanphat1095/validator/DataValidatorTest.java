@@ -16,10 +16,10 @@
 
 package io.github.tanphat1095.validator;
 
-import io.github.tanphat1095.validator.field.DoubleFieldValidator;
-import io.github.tanphat1095.validator.field.FieldValidator;
-import io.github.tanphat1095.validator.field.IntFieldValidator;
-import io.github.tanphat1095.validator.field.LongFieldValidator;
+import io.github.tanphat1095.validator.field.DoubleValidator;
+import io.github.tanphat1095.validator.field.ObjectValidator;
+import io.github.tanphat1095.validator.field.IntValidator;
+import io.github.tanphat1095.validator.field.LongValidator;
 import io.github.tanphat1095.validator.field.Validator;
 import org.junit.jupiter.api.Test;
 import io.github.tanphat1095.validator.common.rule.CommonRules;
@@ -54,10 +54,10 @@ class DataValidatorTest {
         DoubleRuleValidator positivePrice = (value, context, fieldName) -> 
             value > 0.0 ? null : ValidationError.fail(fieldName, "Negative Price");
 
-        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(CommonRules.required(), maxLength10), TestObject::getName);
-        Validator<TestObject> ageValidator = new IntFieldValidator<>("age", List.of(ageMoreThan18), TestObject::getAge);
-        Validator<TestObject> idValidator = new LongFieldValidator<>("id", List.of(positiveId), TestObject::getId);
-        Validator<TestObject> priceValidator = new DoubleFieldValidator<>("price", List.of(positivePrice), TestObject::getPrice);
+        Validator<TestObject> nameValidator = new ObjectValidator<>("name", List.of(CommonRules.required(), maxLength10), TestObject::getName);
+        Validator<TestObject> ageValidator = new IntValidator<>("age", List.of(ageMoreThan18), TestObject::getAge);
+        Validator<TestObject> idValidator = new LongValidator<>("id", List.of(positiveId), TestObject::getId);
+        Validator<TestObject> priceValidator = new DoubleValidator<>("price", List.of(positivePrice), TestObject::getPrice);
 
         DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator, ageValidator, idValidator, priceValidator), null);
 
@@ -75,7 +75,7 @@ class DataValidatorTest {
         IntRuleValidator ageMoreThan18 = (value, context, fieldName) -> 
             value >= 18 ? null : ValidationError.fail(fieldName, "Too young");
 
-        Validator<TestObject> ageValidator = new IntFieldValidator<>("age", List.of(ageMoreThan18), TestObject::getAge);
+        Validator<TestObject> ageValidator = new IntValidator<>("age", List.of(ageMoreThan18), TestObject::getAge);
         DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(ageValidator), null);
 
         Stream<TestObject> validatedStream = dataValidator.validate(dataStream);
@@ -102,8 +102,8 @@ class DataValidatorTest {
                 ? null
                 : ValidationError.fail(fieldName, "Must be even");
 
-        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(mustContainSecret), TestObject::getName);
-        Validator<TestObject> ageValidator = new IntFieldValidator<>("age", List.of(mustBeEven), TestObject::getAge);
+        Validator<TestObject> nameValidator = new ObjectValidator<>("name", List.of(mustContainSecret), TestObject::getName);
+        Validator<TestObject> ageValidator = new IntValidator<>("age", List.of(mustBeEven), TestObject::getAge);
 
         DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator, ageValidator), null);
 
@@ -133,10 +133,10 @@ class DataValidatorTest {
         DoubleRuleValidator positivePrice = (value, context, fieldName) -> 
             value > 0.0 ? null : ValidationError.fail(fieldName, "Negative Price");
 
-        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(minLength5), TestObject::getName);
-        Validator<TestObject> ageValidator = new IntFieldValidator<>("age", List.of(ageMoreThan18), TestObject::getAge);
-        Validator<TestObject> idValidator = new LongFieldValidator<>("id", List.of(positiveId), TestObject::getId);
-        Validator<TestObject> priceValidator = new DoubleFieldValidator<>("price", List.of(positivePrice), TestObject::getPrice);
+        Validator<TestObject> nameValidator = new ObjectValidator<>("name", List.of(minLength5), TestObject::getName);
+        Validator<TestObject> ageValidator = new IntValidator<>("age", List.of(ageMoreThan18), TestObject::getAge);
+        Validator<TestObject> idValidator = new LongValidator<>("id", List.of(positiveId), TestObject::getId);
+        Validator<TestObject> priceValidator = new DoubleValidator<>("price", List.of(positivePrice), TestObject::getPrice);
 
         DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator, ageValidator, idValidator, priceValidator), null);
 
@@ -145,10 +145,10 @@ class DataValidatorTest {
         List<ValidationError> results = invalidObj.getValidationResult();
         assertThat(results).hasSize(4);
         
-        assertThat(results.stream().filter(r -> r.fieldName().equals("name")).findFirst().get().valid()).isFalse();
-        assertThat(results.stream().filter(r -> r.fieldName().equals("age")).findFirst().get().valid()).isFalse();
-        assertThat(results.stream().filter(r -> r.fieldName().equals("id")).findFirst().get().valid()).isFalse();
-        assertThat(results.stream().filter(r -> r.fieldName().equals("price")).findFirst().get().valid()).isFalse();
+        assertThat(results.stream().filter(r -> r.targetName().equals("name")).findFirst().get().valid()).isFalse();
+        assertThat(results.stream().filter(r -> r.targetName().equals("age")).findFirst().get().valid()).isFalse();
+        assertThat(results.stream().filter(r -> r.targetName().equals("id")).findFirst().get().valid()).isFalse();
+        assertThat(results.stream().filter(r -> r.targetName().equals("price")).findFirst().get().valid()).isFalse();
     }
 
     @Test
@@ -157,13 +157,13 @@ class DataValidatorTest {
         List<TestObject> data = List.of(obj);
 
         // String field with empty rules
-        Validator<TestObject> stringValidator = new FieldValidator<>("name", List.of(), TestObject::getName);
+        Validator<TestObject> stringValidator = new ObjectValidator<>("name", List.of(), TestObject::getName);
         // Primitive int with null rules
-        Validator<TestObject> intValidator = new IntFieldValidator<>("age", null, TestObject::getAge);
+        Validator<TestObject> intValidator = new IntValidator<>("age", null, TestObject::getAge);
         // Primitive long with empty rules
-        Validator<TestObject> longValidator = new LongFieldValidator<>("id", List.of(), TestObject::getId);
+        Validator<TestObject> longValidator = new LongValidator<>("id", List.of(), TestObject::getId);
         // Primitive double with null rules
-        Validator<TestObject> doubleValidator = new DoubleFieldValidator<>("price", null, TestObject::getPrice);
+        Validator<TestObject> doubleValidator = new DoubleValidator<>("price", null, TestObject::getPrice);
         
         DataValidator<TestObject> dataValidator = new DataValidator<>(
             List.of(stringValidator, intValidator, longValidator, doubleValidator), 
@@ -182,7 +182,7 @@ class DataValidatorTest {
         List<TestObject> data = List.of(obj);
 
         var maxLength10 = CommonRules.maxStringLength(10);
-        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(maxLength10), TestObject::getName);
+        Validator<TestObject> nameValidator = new ObjectValidator<>("name", List.of(maxLength10), TestObject::getName);
         DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator), null);
 
         // When
@@ -213,7 +213,7 @@ class DataValidatorTest {
         data.add(validObj);
         data.add(null);
         
-        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(CommonRules.required()), TestObject::getName);
+        Validator<TestObject> nameValidator = new ObjectValidator<>("name", List.of(CommonRules.required()), TestObject::getName);
         DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator), null);
 
         // When
@@ -230,7 +230,7 @@ class DataValidatorTest {
         TestObject validObj = new TestObject("John Doe", 25, "Senior Developer", 1000L, 99.9);
         Stream<TestObject> dataStream = Stream.of(validObj, null);
         
-        Validator<TestObject> nameValidator = new FieldValidator<>("name", List.of(CommonRules.required()), TestObject::getName);
+        Validator<TestObject> nameValidator = new ObjectValidator<>("name", List.of(CommonRules.required()), TestObject::getName);
         DataValidator<TestObject> dataValidator = new DataValidator<>(List.of(nameValidator), null);
 
         // When
@@ -250,7 +250,7 @@ class DataValidatorTest {
         data.put("username", null);
         data.put("age", 15);
 
-        Validator<java.util.Map<String, Object>> nameValidator = new FieldValidator<>(
+        Validator<java.util.Map<String, Object>> nameValidator = new ObjectValidator<>(
                 "username", 
                 List.of(CommonRules.required()), 
                 m -> (String) m.get("username")
@@ -259,7 +259,7 @@ class DataValidatorTest {
         IntRuleValidator ageMoreThan18 = (value, context, fieldName) -> 
             value >= 18 ? null : ValidationError.fail(fieldName, "Too young");
             
-        Validator<java.util.Map<String, Object>> ageValidator = new IntFieldValidator<>(
+        Validator<java.util.Map<String, Object>> ageValidator = new IntValidator<>(
                 "age", 
                 List.of(ageMoreThan18), 
                 m -> (Integer) m.get("age")
@@ -277,8 +277,8 @@ class DataValidatorTest {
         assertThat(data).containsKey(MapValidationResultHandler.MAP_RESULT_ERROR);
         List<ValidationError> errors = (List<ValidationError>) data.get(MapValidationResultHandler.MAP_RESULT_ERROR);
         assertThat(errors).hasSize(2);
-        assertThat(errors.get(0).fieldName()).isEqualTo("username");
-        assertThat(errors.get(1).fieldName()).isEqualTo("age");
+        assertThat(errors.get(0).targetName()).isEqualTo("username");
+        assertThat(errors.get(1).targetName()).isEqualTo("age");
         assertThat(errors.get(1).message()).isEqualTo("Too young");
     }
 

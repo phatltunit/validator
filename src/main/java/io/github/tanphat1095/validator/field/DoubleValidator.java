@@ -16,29 +16,29 @@
 
 package io.github.tanphat1095.validator.field;
 
-import io.github.tanphat1095.validator.rule.IntRuleValidator;
+import io.github.tanphat1095.validator.rule.DoubleRuleValidator;
 import io.github.tanphat1095.validator.context.ValidationContext;
 import io.github.tanphat1095.validator.ValidationError;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 /**
  * @author PhatLT
  * @since 1.0.0
  */
-public record IntFieldValidator<E>(String fieldName, List<IntRuleValidator> rules, ToIntFunction<E> getter) implements Validator<E> {
+public record DoubleValidator<E>(String targetName, List<DoubleRuleValidator> rules, ToDoubleFunction<E> getter) implements Validator<E> {
 
     public List<ValidationError> validate(E data, ValidationContext<?, ?> context) {
         if (rules == null || rules.isEmpty())
             return Collections.emptyList();
-        int value = getter.applyAsInt(data);
+        double value = getter.applyAsDouble(data);
 
         List<ValidationError> results = null;
-        for (IntRuleValidator rule : rules) {
-            ValidationError res = rule.validate(value, context, fieldName);
+        for (DoubleRuleValidator rule : rules) {
+            ValidationError res = rule.validate(value, context, targetName);
             if (res != null) {
                 if (results == null) {
                     results = new ArrayList<>();

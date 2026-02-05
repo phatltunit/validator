@@ -16,29 +16,29 @@
 
 package io.github.tanphat1095.validator.field;
 
-import io.github.tanphat1095.validator.rule.LongRuleValidator;
+import io.github.tanphat1095.validator.rule.IntRuleValidator;
 import io.github.tanphat1095.validator.context.ValidationContext;
 import io.github.tanphat1095.validator.ValidationError;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.ToLongFunction;
+import java.util.function.ToIntFunction;
 
 /**
  * @author PhatLT
  * @since 1.0.0
  */
-public record LongFieldValidator<E>(String fieldName, List<LongRuleValidator> rules, ToLongFunction<E> getter) implements Validator<E> {
+public record IntValidator<E>(String targetName, List<IntRuleValidator> rules, ToIntFunction<E> getter) implements Validator<E> {
 
     public List<ValidationError> validate(E data, ValidationContext<?, ?> context) {
         if (rules == null || rules.isEmpty())
             return Collections.emptyList();
-        long value = getter.applyAsLong(data);
+        int value = getter.applyAsInt(data);
 
         List<ValidationError> results = null;
-        for (LongRuleValidator rule : rules) {
-            ValidationError res = rule.validate(value, context, fieldName);
+        for (IntRuleValidator rule : rules) {
+            ValidationError res = rule.validate(value, context, targetName);
             if (res != null) {
                 if (results == null) {
                     results = new ArrayList<>();

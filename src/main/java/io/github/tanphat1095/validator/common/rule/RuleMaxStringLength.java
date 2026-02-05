@@ -31,9 +31,9 @@ public class RuleMaxStringLength extends AbstractRule<String, RuleMaxStringLengt
     private final int maxLength;
 
     @Override
-    public ValidationError validate(String value, ValidationContext<?,?> context, String fieldName) {
+    public ValidationError validate(String value, ValidationContext<?,?> context, String targetName) {
         if(value != null && value.length() > maxLength)
-            return fail(context ,fieldName, "Field {0} should not more than {1} characters", fieldName, maxLength);
+            return fail(context ,targetName, "Field {0} should not more than {1} characters", targetName, maxLength);
         return null;
     }
 }

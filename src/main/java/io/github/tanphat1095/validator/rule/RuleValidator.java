@@ -25,5 +25,5 @@ import io.github.tanphat1095.validator.ValidationError;
  */
 @FunctionalInterface
 public interface RuleValidator<T> {
-    ValidationError validate(T value, ValidationContext<?,?> context, String fieldName);
+    ValidationError validate(T value, ValidationContext<?,?> context, String targetName);
 }

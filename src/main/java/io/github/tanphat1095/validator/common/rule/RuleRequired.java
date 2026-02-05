@@ -27,9 +27,9 @@ import io.github.tanphat1095.validator.rule.AbstractRule;
 public class RuleRequired<T> extends AbstractRule<T, RuleRequired<T>> {
 
     @Override
-    public ValidationError validate(T value, ValidationContext<?,?> context, String fieldName) {
+    public ValidationError validate(T value, ValidationContext<?,?> context, String targetName) {
         if(value == null) {
-            return fail(context, fieldName, "Field {0} is required.", fieldName);
+            return fail(context, targetName, "Field {0} is required.", targetName);
         }
         return null;
     }

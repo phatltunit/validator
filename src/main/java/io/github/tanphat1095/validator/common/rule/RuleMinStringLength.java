@@ -31,9 +31,9 @@ public class RuleMinStringLength extends AbstractRule<String, RuleMinStringLengt
     private final int minLength;
 
     @Override
-    public ValidationError validate(String value, ValidationContext<?, ?> context, String fieldName) {
+    public ValidationError validate(String value, ValidationContext<?, ?> context, String targetName) {
         if(value != null && value.length() < minLength)
-            return fail(context ,fieldName, "Field {0} should not less than {1} characters", fieldName, minLength);
+            return fail(context ,targetName, "Field {0} should not less than {1} characters", targetName, minLength);
         return null;
     }
 }
