@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 PhatLT.
+ * Copyright 2026 Le Tan Phat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import io.github.tanphat1095.validator.context.ValidationContext;
 import io.github.tanphat1095.validator.rule.AbstractRule;
 
 /**
- * @author PhatLT
+ * @author Le Tan Phat
  * @since 1.0.0
  */
 @AllArgsConstructor

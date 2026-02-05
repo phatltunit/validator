@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 PhatLT.
+ * Copyright 2026 Le Tan Phat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 
 /**
- * @author PhatLT
+ * @author Le Tan Phat
  * @since 1.0.0
  */
 public record IntValidator<E>(String targetName, List<IntRuleValidator> rules, ToIntFunction<E> getter) implements Validator<E> {

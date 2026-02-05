@@ -170,4 +170,4 @@ public class LogHandler implements ValidationResultHandler {
 Project is licensed under the **Apache License 2.0**.
 
 ---
-*Created with ❤️ by **PhatLT***
+*Created with ❤️ by **Le Tan Phat***
