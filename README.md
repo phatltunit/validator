@@ -66,11 +66,11 @@ Then, configure and run the validator:
 
 ```java
 // 1. Define Rules
-Validator<User> nameValidator = new FieldValidator<>("name", 
+Validator<User> nameValidator = new ObjectValidator<>("name", 
     List.of(CommonRules.required(), CommonRules.maxStringLength(20)), 
     User::getName);
 
-Validator<User> ageValidator = new IntFieldValidator<>("age", 
+Validator<User> ageValidator = new IntValidator<>("age", 
     List.of((val, ctx, field) -> val >= 18 ? null : ValidationError.fail(field, "Underage")), 
     User::getAge);
 
@@ -109,7 +109,7 @@ validatedStream.forEach(user -> {
 Map<String, Object> row = new HashMap<>();
 row.put("username", "phatlt");
 
-Validator<Map<String, Object>> mapVal = new FieldValidator<>("username", 
+Validator<Map<String, Object>> mapVal = new ObjectValidator<>("username", 
     List.of(CommonRules.required()), 
     m -> (String) m.get("username"));
 
@@ -133,7 +133,7 @@ ValidationContext<String, Object> context = new DefaultValidationContext();
 context.setMessageProvider(i18nProvider);
 
 // 3. Rules will now use your provider for formatting
-Validator<User> nameValidator = new FieldValidator<>("name", 
+Validator<User> nameValidator = new ObjectValidator<>("name", 
     List.of(CommonRules.required().withMessage("name.required_key")), 
     User::getName);
 
